@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0f1115">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Sales">
+<link rel="manifest" href="manifest.json">
+<title>Sales</title>
+<style>
+:root{
+ --bg:#f5f6f8;--card:#fff;--ink:#111318;--muted:#70757d;--line:#e8eaee;
+ --accent:#20a46b;--accent2:#167c52;--shadow:0 8px 28px rgba(15,18,24,.06);
+ font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text",system-ui,sans-serif
+}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink)}
+button,input,select{font:inherit}.app{max-width:760px;margin:auto;padding:env(safe-area-inset-top) 16px calc(28px + env(safe-area-inset-bottom))}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:18px 2px 14px}
+.brand{display:flex;align-items:center;gap:10px}.logo{width:36px;height:36px;border-radius:11px;background:#111318;color:#fff;display:grid;place-items:center;font-weight:900;letter-spacing:-1px}
+.title{font-size:22px;font-weight:800;letter-spacing:-.5px}.subtitle{font-size:12px;color:var(--muted);margin-top:1px}
+.iconbtn{width:40px;height:40px;border:1px solid var(--line);background:#fff;border-radius:12px;font-size:19px}
+.balance{background:linear-gradient(145deg,#111318,#20242b);color:#fff;border-radius:24px;padding:22px 20px;box-shadow:0 12px 30px rgba(15,18,24,.16);position:relative;overflow:hidden}
+.balance:after{content:"";position:absolute;width:150px;height:150px;border-radius:50%;right:-55px;top:-65px;background:rgba(255,255,255,.06)}
+.eyebrow{font-size:12px;color:#aeb3bb;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
+.big{font-size:41px;font-weight:850;letter-spacing:-1.8px;margin:5px 0 10px}.growth{font-size:13px;color:#6ee7a8;font-weight:750}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0}
+.card{background:var(--card);border:1px solid rgba(17,19,24,.04);border-radius:20px;box-shadow:var(--shadow)}
+.kpi{padding:16px}.kpi-top{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-size:13px}.kpi-icon{width:30px;height:30px;border-radius:9px;background:#eef8f3;color:var(--accent2);display:grid;place-items:center;font-weight:800}
+.kpi-value{font-size:24px;font-weight:850;margin-top:8px;letter-spacing:-.5px}.kpi-note{font-size:11px;color:var(--muted);margin-top:3px}
+.panel{padding:18px;margin-top:12px}.panelhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.paneltitle{font-size:16px;font-weight:800}.select{border:1px solid var(--line);background:#fafbfc;border-radius:10px;padding:7px 9px;font-size:12px}
+canvas{width:100%;height:205px;display:block}
+.orders{margin-top:12px}.orderhead{padding:18px 18px 10px;display:flex;justify-content:space-between}.view{font-size:12px;color:var(--accent2);font-weight:750}
+.order{display:flex;align-items:center;justify-content:space-between;padding:13px 18px;border-top:1px solid var(--line)}
+.avatar{width:38px;height:38px;border-radius:12px;background:#f0f2f5;display:grid;place-items:center;font-weight:800;color:#565c65}.left{display:flex;gap:11px;align-items:center;min-width:0}.name{font-weight:750;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.id{font-size:11px;color:var(--muted);margin-top:2px}.price{font-weight:800;font-size:14px}.status{font-size:10px;color:var(--accent2);background:#ecf8f2;border-radius:99px;padding:4px 7px;margin-top:4px;display:inline-block;font-weight:700}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}.btn{border:0;border-radius:14px;padding:13px 14px;font-weight:800;background:#111318;color:#fff}.btn.secondary{background:#fff;color:#111318;border:1px solid var(--line)}
+.footer{font-size:10px;color:#9a9ea6;text-align:center;margin:16px 0 4px}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);align-items:flex-end;justify-content:center;padding:12px}.modal.show{display:flex}
+.sheet{background:#fff;width:min(760px,100%);border-radius:24px;padding:20px;box-shadow:0 -10px 40px rgba(0,0,0,.15)}.sheet h2{margin:0 0 4px}.sheet p{margin:0;color:var(--muted);font-size:13px}.sheet input{width:100%;margin:16px 0;padding:14px;border:1px solid var(--line);border-radius:13px;outline:none}.sheet input:focus{border-color:#8bcdb0}
+@media(min-width:700px){.app{padding-top:20px}.kpis{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<main class="app">
+<header class="topbar">
+  <div class="brand"><div class="logo">$</div><div><div class="title">Sales</div><div class="subtitle">Overview</div></div></div>
+  <button class="iconbtn" id="addBtn" aria-label="Add sale">＋</button>
+</header>
+
+<section class="balance">
+  <div class="eyebrow">Current balance</div>
+  <div class="big" id="balance">$2,847.63</div>
+  <div class="growth">↗ <span id="change">12.8%</span> today</div>
+</section>
+
+<section class="kpis">
+  <div class="card kpi"><div class="kpi-top"><span>Revenue</span><span class="kpi-icon">$</span></div><div class="kpi-value" id="revenue">$384.20</div><div class="kpi-note">Today</div></div>
+  <div class="card kpi"><div class="kpi-top"><span>Orders</span><span class="kpi-icon">#</span></div><div class="kpi-value" id="orders">27</div><div class="kpi-note">Today</div></div>
+</section>
+
+<section class="card panel">
+  <div class="panelhead"><div class="paneltitle">Revenue</div><select class="select" id="range"><option value="7">Last 7 days</option><option value="30">Last 30 days</option></select></div>
+  <canvas id="revChart"></canvas>
+</section>
+
+<section class="card panel">
+  <div class="panelhead"><div class="paneltitle">Orders</div><span class="subtitle">Daily activity</span></div>
+  <canvas id="salesChart"></canvas>
+</section>
+
+<section class="card orders">
+  <div class="orderhead"><div class="paneltitle">Recent orders</div><div class="view" id="orderCount">27 total</div></div>
+  <div id="ordersList"></div>
+</section>
+
+<div class="actions">
+  <button class="btn secondary" id="resetBtn">Reset data</button>
+  <button class="btn" id="pauseBtn">⏸ Pause auto-sales</button>
+</div>
+<div style="text-align:center;font-size:11px;color:#8a8f98;margin-top:9px">
+  <span style="color:#20a46b">●</span> Auto-sales active · new simulated sale every few seconds
+</div>
+<div class="footer">Simulated account data · no real money or transactions</div>
+</main>
+
+<div class="modal" id="modal">
+ <div class="sheet">
+  <h2>Add sale</h2><p>Create a simulated order and update the dashboard.</p>
+  <input id="amount" type="number" min="0.01" step="0.01" value="24.99" inputmode="decimal">
+  <div class="actions"><button class="btn" id="confirm">Add sale</button><button class="btn secondary" id="cancel">Cancel</button></div>
+ </div>
+</div>
+
+<script>
+const $=s=>document.querySelector(s);
+const initialState={balance:2847.63,revenue:384.20,orders:27,rev:[210,275,238,318,292,341,384],sales:[15,18,16,21,19,23,27]};
+let state=JSON.parse(JSON.stringify(initialState));
+const initial=[["Desk organizer","#4821",42],["Phone stand","#4819",29.99],["Desk mat","#4817",18.50],["Wireless accessory","#4814",34.99],["Cable holder","#4811",16.75],["Monitor riser","#4808",39.99]];
+
+function money(n){return new Intl.NumberFormat("en-US",{style:"currency",currency:"USD"}).format(n)}
+function initials(name){return name.split(" ").map(x=>x[0]).slice(0,2).join("")}
+function makeOrder(name,id,amount){const row=document.createElement("div");row.className="order";row.innerHTML=`<div class="left"><div class="avatar">${initials(name)}</div><div><div class="name">${name}</div><div class="id">${id} · just now</div><span class="status">Paid</span></div></div><div class="price">+${money(amount)}</div>`;return row}
+function fillInitial(){const list=$("#ordersList");list.innerHTML="";initial.forEach(o=>list.appendChild(makeOrder(o[0],o[1],o[2])))}
+function draw(canvas,data){
+ const dpr=devicePixelRatio||1,w=canvas.clientWidth,h=205;canvas.width=w*dpr;canvas.height=h*dpr;
+ const c=canvas.getContext("2d");c.setTransform(dpr,0,0,dpr,0,0);c.clearRect(0,0,w,h);
+ const pad={l:12,r:12,t:14,b:28},max=Math.max(...data)*1.15||1,min=Math.min(...data)*.82||0;
+ for(let i=0;i<4;i++){const y=pad.t+i*(h-pad.t-pad.b)/3;c.strokeStyle="#eef0f3";c.lineWidth=1;c.beginPath();c.moveTo(pad.l,y);c.lineTo(w-pad.r,y);c.stroke()}
+ const pts=data.map((v,i)=>({x:pad.l+i*(w-pad.l-pad.r)/(data.length-1),y:h-pad.b-(v-min)/(max-min)*(h-pad.t-pad.b)}));
+ const g=c.createLinearGradient(0,0,0,h);g.addColorStop(0,"rgba(32,164,107,.20)");g.addColorStop(1,"rgba(32,164,107,0)");
+ c.beginPath();pts.forEach((p,i)=>i?c.lineTo(p.x,p.y):c.moveTo(p.x,p.y));c.lineTo(pts.at(-1).x,h-pad.b);c.lineTo(pts[0].x,h-pad.b);c.closePath();c.fillStyle=g;c.fill();
+ c.beginPath();pts.forEach((p,i)=>i?c.lineTo(p.x,p.y):c.moveTo(p.x,p.y));c.strokeStyle="#20a46b";c.lineWidth=3;c.lineJoin="round";c.lineCap="round";c.stroke();
+ pts.forEach((p,i)=>{if(i===pts.length-1){c.fillStyle="#fff";c.beginPath();c.arc(p.x,p.y,5,0,Math.PI*2);c.fill();c.fillStyle="#20a46b";c.beginPath();c.arc(p.x,p.y,3,0,Math.PI*2);c.fill()}});
+ c.fillStyle="#8a8f98";c.font="11px -apple-system,BlinkMacSystemFont,sans-serif";c.fillText(data.length===7?"7 days":"30 days",pad.l,h-7);c.textAlign="right";c.fillText("Today",w-pad.r,h-7);c.textAlign="left";
+}
+function render(){
+ $("#balance").textContent=money(state.balance);$("#revenue").textContent=money(state.revenue);$("#orders").textContent=state.orders;$("#orderCount").textContent=state.orders+" total";
+ const days=$("#range").value==="30"?30:7;
+ const rev=days===7?state.rev:state.rev.concat([401,390,420,438,410,452,468,455,480,493,470,510,525,501,540,558,545,570,590,578,610,625,603]);
+ draw($("#revChart"),rev);draw($("#salesChart"),state.sales);
+}
+function addOrder(amount){const row=makeOrder("New order","#"+Math.floor(1000+Math.random()*9000),amount);$("#ordersList").prepend(row);while($("#ordersList").children.length>6)$("#ordersList").lastElementChild.remove()}
+function addSale(amount){amount=Math.round(Number(amount)*100)/100;if(!isFinite(amount)||amount<=0)return;state.balance+=amount;state.revenue+=amount;state.orders++;state.rev=state.rev.slice(1).concat([state.revenue]);state.sales=state.sales.slice(1).concat([state.orders]);addOrder(amount);render()}
+$("#addBtn").onclick=()=>$("#modal").classList.add("show");
+$("#cancel").onclick=()=>$("#modal").classList.remove("show");
+$("#confirm").onclick=()=>{addSale($("#amount").value);$("#modal").classList.remove("show")};
+
+$("#resetBtn").onclick=()=>{state=JSON.parse(JSON.stringify(initialState));fillInitial();render()};
+let autoSales=true;
+let autoTimer;
+function scheduleAutoSale(){
+  clearTimeout(autoTimer);
+  if(!autoSales)return;
+  autoTimer=setTimeout(()=>{
+    const amount=Math.round((Math.random()*62+12)*100)/100;
+    addSale(amount);
+    scheduleAutoSale();
+  }, 8000 + Math.random()*7000);
+}
+$("#pauseBtn").onclick=()=>{
+  autoSales=!autoSales;
+  $("#pauseBtn").textContent=autoSales?"⏸ Pause auto-sales":"▶ Resume auto-sales";
+  if(autoSales)scheduleAutoSale(); else clearTimeout(autoTimer);
+};
+scheduleAutoSale();
+$("#range").onchange=render;addEventListener("resize",render);fillInitial();render();
+</script>
+</body>
+</html>
